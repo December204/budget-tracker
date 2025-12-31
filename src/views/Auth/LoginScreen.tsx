@@ -22,6 +22,14 @@ const LoginScreen = () => {
         }),
       );
     },
+    onError: (_, data) => {
+      enqueueSnackbar('Login failed');
+      dispatch(
+        signIn({
+          username: data.username,
+        }),
+      );
+    },
   });
 
   const handleClickSubmit = () => {
