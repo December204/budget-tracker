@@ -1,13 +1,6 @@
-@import '~slick-carousel/slick/slick.css';
-@import '~slick-carousel/slick/slick-theme.css';
-
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-
-@import 'styles/vars';
-@import 'styles/custom';
-@import 'styles/mui';
+@use 'styles/vars' as *;
+@use 'styles/custom' as *;
+@use 'styles/mui' as *;
 
 main {
   min-height: 100vh;
