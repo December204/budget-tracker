@@ -8,16 +8,17 @@ export const profileSlice = createSlice({
   } as ProfileType,
   reducers: {
     signIn: (state, { payload }: PayloadAction<ProfileType>) => {
-      const profile = { ...payload, isLoggedIn: true };
-      return profile;
+      return { ...payload, isLoggedIn: true };
     },
-    signOut: (state) => {
-      const profile = { isLoggedIn: false };
-      return profile;
+    signOut: () => {
+      return { isLoggedIn: false };
+    },
+    setAccessToken: (state, { payload }: PayloadAction<string>) => {
+      state.accessToken = payload;
     },
   },
 });
 
-export const { signIn, signOut } = profileSlice.actions;
+export const { signIn, signOut, setAccessToken } = profileSlice.actions;
 
 export const profileSelector = ({ profile }: RootState) => profile;
