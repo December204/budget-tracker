@@ -1,20 +1,22 @@
 type LoginBody = {
-  username: string;
+  email: string;
   password: string;
 };
 
-type LoginResponse = DBTimeAudit & {
+type LoginResponse = {
   token: string;
-  id: number;
-  isAdmin: boolean;
-  username: string;
-  accountInfo: AccountInfo;
+  id?: number;
+  email?: string;
+  isAdmin?: boolean;
+  username?: string;
+  accountInfo?: AccountInfo;
 };
 
 type ProfileType = {
   isLoggedIn?: boolean;
   accessToken?: string;
   id?: number;
+  email?: string;
   isAdmin?: boolean;
   username?: string;
   accountInfo?: AccountInfo;
@@ -25,10 +27,6 @@ type RegisterBody = {
   password: string;
   firstName: string;
   lastName: string;
-  phoneNumber: string;
-  adress: string;
-  sex: AccountSexType;
-  dateOfBirth: ISOString;
 };
 
 type RegisterResponse = LoginResponse;

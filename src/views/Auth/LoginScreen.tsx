@@ -1,92 +1,76 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { LoadingButton } from '@mui/lab';
-import { Container, Paper, TextField } from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
+import { Container, Link, Paper, TextField, Typography } from '@mui/material';
 import { InputPassword } from 'components/common';
-import { enqueueSnackbar } from 'notistack';
+import { useLogin } from 'hooks/useAuth';
 import { Controller, useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import { signIn } from 'reducers/profileSlice';
-import { authService } from 'services';
+import { Link as RouterLink } from 'react-router-dom';
+import { z } from 'zod';
+
+const schema = z.object({
+  email: z.string().min(1, 'Vui lòng nhập email').email('Email không hợp lệ'),
+  password: z.string().min(1, 'Vui lòng nhập mật khẩu'),
+});
+
+type FormValues = z.infer<typeof schema>;
 
 const LoginScreen = () => {
-  const dispatch = useDispatch();
-  const { control, handleSubmit } = useForm({ mode: 'onChange' });
+  const { mutate: login, isLoading } = useLogin();
 
-  const { mutate: login, isLoading } = useMutation(authService.login, {
-    onSuccess: ({ token, ...info }) => {
-      enqueueSnackbar('Login successfully');
-      dispatch(
-        signIn({
-          accessToken: token,
-          ...info,
-        }),
-      );
-    },
-    onError: (_, data) => {
-      enqueueSnackbar('Login failed');
-      dispatch(
-        signIn({
-          username: data.username,
-        }),
-      );
-    },
-  });
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
-  const handleClickSubmit = () => {
-    handleSubmit((values) => {
-      login({
-        ...(values as LoginBody),
-      });
-    })();
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter') {
-      handleClickSubmit();
-    }
+  const onSubmit = (values: FormValues) => {
+    login(values);
   };
 
   return (
     <Container maxWidth='sm'>
       <Paper className='space-y-6 p-6'>
-        <h4 className='text-center text-2xl font-bold'>LoginScreen</h4>
+        <Typography variant='h5' className='text-center font-bold'>
+          Đăng nhập
+        </Typography>
 
-        <div className='flex flex-col items-center justify-center gap-6'>
-          <Controller
-            name='username'
-            defaultValue='user@example.com'
-            control={control}
-            rules={{
-              required: 'Username is required',
-            }}
-            render={({ field, fieldState: { error } }) => (
-              <TextField {...field} fullWidth label='Username' error={!!error} helperText={error?.message} />
-            )}
+        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
+          <TextField
+            {...register('email')}
+            fullWidth
+            label='Email'
+            autoComplete='email'
+            error={!!errors.email}
+            helperText={errors.email?.message}
           />
 
           <Controller
             name='password'
-            defaultValue='string'
             control={control}
-            rules={{
-              required: 'Password is required',
-            }}
             render={({ field, fieldState: { error } }) => (
               <InputPassword
                 {...field}
                 fullWidth
-                label='Password'
-                onKeyDown={handleKeyDown}
+                label='Mật khẩu'
+                autoComplete='current-password'
                 error={!!error}
                 helperText={error?.message}
               />
             )}
           />
 
-          <LoadingButton fullWidth variant='contained' loading={isLoading} onClick={handleClickSubmit}>
-            Login
+          <LoadingButton type='submit' fullWidth variant='contained' loading={isLoading}>
+            Đăng nhập
           </LoadingButton>
-        </div>
+
+          <Typography variant='body2' className='text-center'>
+            Chưa có tài khoản?{' '}
+            <Link component={RouterLink} to='/auth/register'>
+              Đăng ký ngay
+            </Link>
+          </Typography>
+        </form>
       </Paper>
     </Container>
   );
