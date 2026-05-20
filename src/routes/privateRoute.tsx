@@ -1,5 +1,6 @@
 import { Home } from 'views/Home';
 import { Profile } from 'views/Profile';
+import { Transactions } from 'views/Transactions';
 
 const privateRoute = {
   home: {
@@ -11,6 +12,11 @@ const privateRoute = {
     path: '/profile',
     name: 'Profile',
     component: Profile,
+  },
+  transactions: {
+    path: '/transactions',
+    name: 'Giao dịch',
+    component: Transactions,
   },
 };
 
