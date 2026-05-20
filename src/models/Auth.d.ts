@@ -3,25 +3,6 @@ type LoginBody = {
   password: string;
 };
 
-type LoginResponse = {
-  token: string;
-  id?: number;
-  email?: string;
-  isAdmin?: boolean;
-  username?: string;
-  accountInfo?: AccountInfo;
-};
-
-type ProfileType = {
-  isLoggedIn?: boolean;
-  accessToken?: string;
-  id?: number;
-  email?: string;
-  isAdmin?: boolean;
-  username?: string;
-  accountInfo?: AccountInfo;
-};
-
 type RegisterBody = {
   email: string;
   password: string;
@@ -29,4 +10,28 @@ type RegisterBody = {
   lastName: string;
 };
 
-type RegisterResponse = LoginResponse;
+type UserProfile = {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+type AuthResponse = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+type RefreshResponse = {
+  accessToken: string;
+};
+
+type ProfileType = {
+  isLoggedIn: boolean;
+  accessToken?: string;
+  user?: UserProfile;
+};
+
+type UpdateProfileBody = Partial<Pick<UserProfile, 'firstName' | 'lastName'>>;
