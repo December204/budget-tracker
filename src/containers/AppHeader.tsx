@@ -1,5 +1,6 @@
 import { Logout } from '@mui/icons-material';
 import { AppBar, Chip, Container, IconButton, List, Paper, Toolbar } from '@mui/material';
+import GithubLogo from 'assets/icons/Github.png';
 import { SwitchTheme } from 'components';
 import { AppMenu } from 'containers';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,7 +21,7 @@ const AppHeader = () => {
       <Toolbar component={Container} maxWidth='xl' className='flex items-center'>
         <div className='min-w-[240px]'>
           <Link to={privateRoute.home.path}>
-            <img src={require('assets/icons/Github.png')} alt='Logo' className='h-[40px]' />
+            <img src={GithubLogo} alt='Logo' className='h-[40px]' />
           </Link>
         </div>
 
