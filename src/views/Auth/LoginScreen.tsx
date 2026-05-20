@@ -8,7 +8,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { z } from 'zod';
 
 const schema = z.object({
-  email: z.string().min(1, 'Vui lòng nhập email').email('Email không hợp lệ'),
+  username: z.string().min(1, 'Vui lòng nhập tên đăng nhập'),
   password: z.string().min(1, 'Vui lòng nhập mật khẩu'),
 });
 
@@ -37,12 +37,12 @@ const LoginScreen = () => {
 
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
           <TextField
-            {...register('email')}
+            {...register('username')}
             fullWidth
-            label='Email'
-            autoComplete='email'
-            error={!!errors.email}
-            helperText={errors.email?.message}
+            label='Tên đăng nhập'
+            autoComplete='username'
+            error={!!errors.username}
+            helperText={errors.username?.message}
           />
 
           <Controller

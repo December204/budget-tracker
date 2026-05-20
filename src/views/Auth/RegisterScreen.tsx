@@ -10,9 +10,13 @@ import { z } from 'zod';
 const schema = z
   .object({
     email: z.string().min(1, 'Vui lòng nhập email').email('Email không hợp lệ'),
-    firstName: z.string().min(1, 'Vui lòng nhập họ'),
-    lastName: z.string().min(1, 'Vui lòng nhập tên'),
-    password: z.string().min(6, 'Mật khẩu tối thiểu 6 ký tự'),
+    username: z
+      .string()
+      .min(3, 'Tên đăng nhập tối thiểu 3 ký tự')
+      .max(50, 'Tên đăng nhập tối đa 50 ký tự')
+      .regex(/^[a-zA-Z0-9_]+$/, 'Chỉ được dùng chữ, số và dấu gạch dưới'),
+    name: z.string().optional(),
+    password: z.string().min(8, 'Mật khẩu tối thiểu 8 ký tự'),
     confirmPassword: z.string().min(1, 'Vui lòng xác nhận mật khẩu'),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -53,24 +57,23 @@ const RegisterScreen = () => {
             helperText={errors.email?.message}
           />
 
-          <div className='flex gap-4'>
-            <TextField
-              {...registerField('firstName')}
-              fullWidth
-              label='Họ'
-              autoComplete='family-name'
-              error={!!errors.firstName}
-              helperText={errors.firstName?.message}
-            />
-            <TextField
-              {...registerField('lastName')}
-              fullWidth
-              label='Tên'
-              autoComplete='given-name'
-              error={!!errors.lastName}
-              helperText={errors.lastName?.message}
-            />
-          </div>
+          <TextField
+            {...registerField('username')}
+            fullWidth
+            label='Tên đăng nhập'
+            autoComplete='username'
+            error={!!errors.username}
+            helperText={errors.username?.message}
+          />
+
+          <TextField
+            {...registerField('name')}
+            fullWidth
+            label='Họ và tên (tùy chọn)'
+            autoComplete='name'
+            error={!!errors.name}
+            helperText={errors.name?.message}
+          />
 
           <Controller
             name='password'

@@ -1,20 +1,20 @@
 type LoginBody = {
-  email: string;
+  username: string;
   password: string;
 };
 
 type RegisterBody = {
   email: string;
+  username: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  name?: string;
 };
 
 type UserProfile = {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  username: string;
+  name: string;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -26,6 +26,7 @@ type AuthResponse = {
 
 type RefreshResponse = {
   accessToken: string;
+  refreshToken: string;
 };
 
 type ProfileType = {
@@ -34,4 +35,6 @@ type ProfileType = {
   user?: UserProfile;
 };
 
-type UpdateProfileBody = Partial<Pick<UserProfile, 'firstName' | 'lastName'>>;
+type UpdateProfileBody = {
+  name?: string;
+};
