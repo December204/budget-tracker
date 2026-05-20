@@ -3,18 +3,19 @@ import { AppBar, Chip, Container, IconButton, List, Paper, Toolbar } from '@mui/
 import GithubLogo from 'assets/icons/Github.png';
 import { SwitchTheme } from 'components';
 import { AppMenu } from 'containers';
-import { useDispatch, useSelector } from 'react-redux';
+import { useLogout } from 'hooks/useAuth';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { profileSelector, signOut } from 'reducers/profileSlice';
+import { profileSelector } from 'reducers/profileSlice';
 import { privateRoute } from 'routes';
 
 const AppHeader = () => {
-  const dispatch = useDispatch();
-  const { username } = useSelector(profileSelector);
+  const { user } = useSelector(profileSelector);
+  const { mutate: logout } = useLogout();
 
-  const handleClickLogout = () => {
-    dispatch(signOut());
-  };
+  const displayName = user
+    ? `${user.firstName} ${user.lastName}`.trim() || user.email
+    : '';
 
   return (
     <AppBar position='sticky' color='transparent' elevation={0} className='bg-paper-main'>
@@ -33,8 +34,8 @@ const AppHeader = () => {
 
         <div className='flex min-w-[240px] items-center justify-end gap-2'>
           <SwitchTheme />
-          <Chip className='font-bold' label={username} />
-          <IconButton onClick={handleClickLogout}>
+          <Chip className='font-bold' label={displayName} />
+          <IconButton onClick={() => logout()}>
             <Logout />
           </IconButton>
         </div>

@@ -3,15 +3,24 @@ import { enqueueSnackbar } from 'notistack';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { signIn, signOut } from 'reducers/profileSlice';
-import { authService } from 'services';
+import { authService, userService } from 'services';
+import { REFRESH_TOKEN_KEY } from 'lib/axiosInstance';
+
+const storeTokens = (accessToken: string, refreshToken: string) => {
+  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  return accessToken;
+};
 
 export const useLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   return useMutation(authService.login, {
-    onSuccess: ({ token, ...rest }) => {
-      dispatch(signIn({ accessToken: token, ...rest }));
+    onSuccess: async ({ accessToken, refreshToken }: AuthResponse) => {
+      storeTokens(accessToken, refreshToken);
+      dispatch(signIn({ isLoggedIn: true, accessToken }));
+      const user = await userService.getMe();
+      dispatch(signIn({ isLoggedIn: true, accessToken, user }));
       enqueueSnackbar('Đăng nhập thành công', { variant: 'success' });
       navigate('/');
     },
@@ -23,12 +32,17 @@ export const useLogin = () => {
 };
 
 export const useRegister = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   return useMutation(authService.register, {
-    onSuccess: () => {
-      enqueueSnackbar('Đăng ký thành công, vui lòng đăng nhập', { variant: 'success' });
-      navigate('/auth/login');
+    onSuccess: async ({ accessToken, refreshToken }: AuthResponse) => {
+      storeTokens(accessToken, refreshToken);
+      dispatch(signIn({ isLoggedIn: true, accessToken }));
+      const user = await userService.getMe();
+      dispatch(signIn({ isLoggedIn: true, accessToken, user }));
+      enqueueSnackbar('Đăng ký thành công', { variant: 'success' });
+      navigate('/');
     },
     onError: (error: any) => {
       const message = error?.response?.data?.message ?? 'Đăng ký thất bại';
@@ -43,6 +57,7 @@ export const useLogout = () => {
 
   return useMutation(authService.logout, {
     onSettled: () => {
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
       dispatch(signOut());
       navigate('/auth/login');
     },

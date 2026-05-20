@@ -4,6 +4,8 @@ import { enqueueSnackbar } from 'notistack';
 import { setAccessToken, signOut } from 'reducers/profileSlice';
 import { store } from 'reducers/store';
 
+export const REFRESH_TOKEN_KEY = 'refreshToken';
+
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
 
@@ -15,7 +17,7 @@ const processQueue = (error: unknown, token: string | null) => {
   failedQueue = [];
 };
 
-const axiosInstance = axios.create({ baseURL: `${API_URL}/sfo-core/api` });
+const axiosInstance = axios.create({ baseURL: `${API_URL}/api` });
 
 axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const { isLoggedIn, accessToken }: ProfileType = store.getState().profile;
@@ -29,8 +31,8 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 });
 
 axiosInstance.interceptors.response.use(
-  ({ data }: AxiosResponse) => data,
-  async (error: AxiosError<ErrorResponse>) => {
+  ({ data }: AxiosResponse) => (data?.data !== undefined ? data.data : data),
+  async (error: AxiosError<{ message?: string }>) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -47,18 +49,17 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await axios.post(
-          `${API_URL}/sfo-core/api/auth/refresh`,
-          {},
-          { withCredentials: true },
-        );
-        const newToken: string = data.token ?? data.accessToken;
+        const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+        const { data: body } = await axios.post(`${API_URL}/api/auth/refresh`, { refreshToken });
+        const payload = body?.data ?? body;
+        const newToken: string = payload?.accessToken;
         store.dispatch(setAccessToken(newToken));
         processQueue(null, newToken);
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
         store.dispatch(signOut());
         return Promise.reject(refreshError);
       } finally {
